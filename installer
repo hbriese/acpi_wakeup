@@ -1,0 +1,25 @@
+#!/bin/bash
+
+SCRIPT="disable-wakeup-devices.py"
+SCRIPT_PATH="/usr/bin/${SCRIPT}"
+SERVICE="disable-wakeup-devices.service"
+SERVICE_PATH="/etc/systemd/system/${SERVICE}"
+
+if [[ "$1" == "install" ]] || [[ "$1" == "-i" ]]; then
+    echo "Installing (requires root)..."
+    sudo chmod +x ./${SCRIPT}
+    sudo cp -f ./${SCRIPT} ${SCRIPT_PATH}
+    sudo cp -f ./${SERVICE} ${SERVICE_PATH}
+    sudo systemctl enable ${SERVICE}
+    sudo systemctl start ${SERVICE}
+    sudo systemctl status ${SERVICE}
+elif [[ "$1" == "uninstall" ]] || [[ "$1" == "-u" ]]; then
+    echo "Uninstalling (requires root)..."
+    sudo systemctl disable ${SERVICE}
+    sudo rm -f ${SERVICE_PATH}
+    sudo rm -f ${SCRIPT_PATH}
+else
+    echo "Options:"
+    echo "    -i install    Install script and systemd service"
+    echo "    -u uninstall  Uninstall script and systemd service"
+fi
