@@ -17,7 +17,8 @@ def read_config():
 
         return devices
 
-    return None
+    # Else return default devices
+    return ['PBTN', r'LID[\d]*']
 
 
 def device_in_list(enable_devs, dev, sysfs_node):
@@ -67,13 +68,11 @@ if __name__ == '__main__':
 
     # Wakeup devices order of pref: args, config, default values
     enable_devices = args.devices if args.devices else read_config()
-    if enable_devices is None:
-        enable_devices = ['PBTN', r'LID[\d]*']
 
     if args.set:
-        # if os.getuid() != 0:
-        #     print('Must be run as root.')
-        #     exit(1)
+        if os.getuid() != 0:
+            print('Must be run as root.')
+            exit(1)
 
         acpi_devices = [l.strip().split() for l in acpi_lines][1:]
         for l in acpi_devices:
