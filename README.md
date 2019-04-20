@@ -1,23 +1,24 @@
 
-# DisableACPIWakeupDevices
-> Disable all but a set of ACPI wakeup devices on boot.
+# acpi_wakeup
+> Disable/enable ACPI wakeup devices
 
 #### Install
 ```bash
-$ DisableACPIWakeupDevices/installer install
+$ git clone https://github.com/hbriese/acpi_wakeup.git
+$ acpi_wakeup/installer install
 ```
 
 
 #### Uninstall
 ```bash
-$ DisableACPIWakeupDevices/installer uninstall
+$ /opt/acpi_wakeup/installer uninstall
 ```
 
 
 ## Usage
 #### List ACPI wakeup devies
 ```bash
-$ disable-wakeup-devices -l
+$ acpi_wakeup -l
 ```
 
 
@@ -52,26 +53,26 @@ $ sudo rm /etc/wakeup-devices.conf
 
 #### Service Status
 ```bash
-$ sudo systemctl status disable-wakeup-devices.service
+$ sudo systemctl status acpi_wakeup.service
 ```
 
 
 #### Keep enabled specified wakeup devices (non-persistent)
 _Overrides devices in /etc/wakeup-devices.conf_
 ```bash
-$ disable-wakeup-devices -s -d DEVICE DEVICE ...
+$ acpi_wakeup -s -d DEVICE DEVICE ...
 ```
 
 _e.g._
 ```bash
-$ disable-wakeup-devices -s -d PBTN LID[\d]* pci:0000:00:14.0
+$ acpi_wakeup -s -d PBTN LID[\d]* pci:0000:00:14.0
 ```
 
 
 ##### Disable ALL devices
 Use --devices (-d) without any options to disable all wakeup devices.
 ```bash
-$ disable-wakeup-devices -s -d
+$ acpi_wakeup -s -d
 ```
 
 
@@ -81,5 +82,5 @@ Automatically executed on start by systemd.
 Use with other options for them to have an affect.
 
 ```bash
-$ disable-wakeup-devices -s
+$ acpi_wakeup -s
 ```

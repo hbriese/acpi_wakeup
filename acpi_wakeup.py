@@ -22,11 +22,11 @@ def read_config():
 
 
 def device_in_list(enable_devs, dev, sysfs_node):
-    enable = any((re.match(expr, dev) for expr in enable_devs))
-    if not enable and sysfs_node:
-        enable = any((re.match(expr, sysfs_node) for expr in enable_devs))
+    found = any((re.match(expr, dev) for expr in enable_devs))
+    if not found and sysfs_node:
+        found = any((re.match(expr, sysfs_node) for expr in enable_devs))
 
-    return enable
+    return found
 
 
 def echo(file, s):
@@ -70,13 +70,13 @@ if __name__ == '__main__':
     enable_devices = args.devices if args.devices else read_config()
 
     if args.set:
-        if os.getuid() != 0:
-            print('Must be run as root.')
-            exit(1)
+        # if os.getuid() != 0:
+        #     print('Must be run as root.')
+        #     exit(1)
 
-        acpi_devices = [l.strip().split() for l in acpi_lines][1:]
-        for l in acpi_devices:
-            set_device_wakeup(acpi_wakeup_path, args.devices, l)
+        acpi_device_lines = [l.strip().split() for l in acpi_lines][1:]
+        for l in acpi_device_lines:
+            set_device_wakeup(acpi_wakeup_path, enable_devices, l)
     elif args.list:
         print(''.join(acpi_lines))
     else:

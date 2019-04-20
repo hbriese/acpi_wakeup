@@ -1,0 +1,11 @@
+[Unit]
+Description=disable/enable ACPI wakeup devices
+
+[Service]
+Type=oneshot
+ExecStart=/opt/acpi_wakeup/venv/bin/python3 /opt/acpi_wakeup/acpi_wakeup.py -s
+StandardOutput=syslog
+StandardError=syslog
+
+[Install]
+WantedBy=multi-user.target
