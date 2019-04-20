@@ -2,6 +2,8 @@
 # acpi_wakeup
 > Disable/enable ACPI wakeup devices
 
+[![License](http://img.shields.io/badge/license-APACHE2-blue.svg)]()
+
 #### Install
 ```bash
 $ git clone https://github.com/hbriese/acpi_wakeup.git
