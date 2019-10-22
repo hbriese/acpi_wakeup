@@ -7,13 +7,7 @@
 #### Install
 ```bash
 $ git clone https://github.com/hbriese/acpi_wakeup.git
-$ acpi_wakeup/installer install
-```
-
-
-#### Uninstall
-```bash
-$ /opt/acpi_wakeup/installer uninstall
+$ sudo acpi_wakeup/install.sh
 ```
 
 
