@@ -3,17 +3,19 @@ import argparse
 import os
 import re
 
+DEVICES_PATH = '/proc/acpi/wakeup'
+
 
 def read_config():
-    conf_path = '/etc/wakeup-devices.conf'
+    conf_path = '/etc/acpi_wakeup.conf'
 
     if os.path.exists(conf_path):
         devices = []
         with open(conf_path, 'r') as f:
-            for l in f:
-                l = l.strip()
-                if l:
-                    devices.append(l)
+            for dev in f:
+                dev = dev.lstrip().partition('#')[0].rstrip()
+                if len(dev) > 0:
+                    devices.append(dev)
 
         return devices
 
@@ -33,19 +35,41 @@ def echo(file, s):
     os.system('echo "{}" > {}'.format(s, file))
 
 
-def set_device_wakeup(wakeup_path, enable_devs, l):
+def print_devices():
+    with open(DEVICES_PATH, 'r') as f:
+        print(''.join(f.readlines()))
+
+
+def get_devices():
+    devices = []    # Devices are tuples (Device, S-state, Status, Sysfs node)
+    with open(DEVICES_PATH, 'r') as f:
+        f.readline()    # Ignore first line
+        for l in f:
+            l = l.strip().split()
+            # Add Devices & S-state if they're empty
+            if len(l) > 0 and len(l[0]) > 0 and l[0][0] == '*':
+                l = ['', ''] + l
+
+            if len(l) < 4:  # Add empty Sysfs node if required
+                l.append('')
+
+            l[2] = 'enabled' in l[2]    # Convert status to bool
+            devices.append(l)
+
+    return devices
+
+
+def set_device_wakeup(enable_devs, dev):
     # Device   S-state   Status   Sysfs node
-    dev = l[0]
-    enabled = 'enabled' in l[2]
-    sysfs_node = l[3] if len(l) >= 4 else None
+    name, state, status, node = dev
 
-    enable = device_in_list(enable_devs, dev, sysfs_node)
-    if enabled ^ enable:  # (enabled and not enable_dev) or (not enabled and enable_dev):
-        echo(wakeup_path, dev)
+    enable = device_in_list(enable_devs, name, node)
+    if status ^ enable:  # (enabled and not enable_dev) or (not enabled and enable_dev):
+        echo(DEVICES_PATH, name)
 
-        if sysfs_node:  # Disable devices with a sysfs node manually
-            dev_type, dev = sysfs_node.split(sep=':', maxsplit=1)
-            p = '/sys/bus/{}/devices/{}/power/wakeup'.format(dev_type, dev)
+        if node:  # Disable devices with a provided node manually
+            dev_type, name = node.split(sep=':', maxsplit=1)
+            p = '/sys/bus/{}/devices/{}/power/wakeup'.format(dev_type, name)
             if os.path.exists(p):
                 echo(p, 'enabled' if enable else 'disabled')
             else:
@@ -61,11 +85,6 @@ if __name__ == '__main__':
                         help='Enable wakeup devices listed, disable those not.')
     args = parser.parse_args()
 
-    # Read acpi wakeup devices
-    acpi_wakeup_path = '/proc/acpi/wakeup'
-    with open(acpi_wakeup_path, 'r') as f:
-        acpi_lines = f.readlines()
-
     # Wakeup devices order of pref: args, config, default values
     enable_devices = args.devices if args.devices else read_config()
 
@@ -74,11 +93,9 @@ if __name__ == '__main__':
             print('Must be run as root.')
             exit(1)
 
-        acpi_device_lines = [l.strip().split() for l in acpi_lines][1:]
-        for l in acpi_device_lines:
-            set_device_wakeup(acpi_wakeup_path, enable_devices, l)
+        for dev in get_devices():
+            set_device_wakeup(enable_devices, dev)
     elif args.list:
-        print(''.join(acpi_lines))
+        print_devices()
     else:
         parser.print_help()
-

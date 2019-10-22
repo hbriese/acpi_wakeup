@@ -27,11 +27,12 @@ $ acpi_wakeup -l
 #### Keep enabled specified wakeup devices (persistent)
 Device names (or sysfs nodes) that you want ACPI wakeups enabled for. Supports regular expressions.
 
-Create a text file at /etc/wakeup-devices.conf with each device on a new line.
+Edit /etc/acpi_wakeup.conf with each device on a new line.
 
 _e.g. Keep awake PBTN (power button), LID devices (e.g. LID...), and a particular PCI devices._
 ```text
-> /etc/wakeup-devices.conf
+> /etc/acpi_wakeup.conf
+# Comments after a hash
 PBTN
 LID[\d]*
 pci:0000:00:14.0
@@ -40,23 +41,6 @@ pci:0000:00:14.0
 > _Default devices enabled:  PBTN LID[\d]*_
 
 **It is recommended to specify devices by their sysfs node (e.g. pci:...) if the device name is not unique.**
-
-##### Disable ALL devices
-Create an empty text file at /etc/wakeup-devices.conf
-```bash
-$ sudo sh -c "echo '' > /etc/wakeup-devices.conf"
-```
-
-##### Restore defaults
-```bash
-$ sudo rm /etc/wakeup-devices.conf
-```
-
-
-#### Service Status
-```bash
-$ sudo systemctl status acpi_wakeup.service
-```
 
 
 #### Keep enabled specified wakeup devices (non-persistent)
@@ -71,14 +55,14 @@ $ acpi_wakeup -s -d PBTN LID[\d]* pci:0000:00:14.0
 ```
 
 
-##### Disable ALL devices
+##### Disable ALL devices (non-persistent)
 Use --devices (-d) without any options to disable all wakeup devices.
 ```bash
 $ acpi_wakeup -s -d
 ```
 
 
-#### Enable/disable wakeup devices
+#### Set wakeup devices
 Automatically executed on start by systemd.
 
 Use with other options for them to have an affect.

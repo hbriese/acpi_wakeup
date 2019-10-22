@@ -1,5 +1,5 @@
 [Unit]
-Description=disable/enable ACPI wakeup devices
+Description=Set ACPI wakeup devices
 
 [Service]
 Type=oneshot
